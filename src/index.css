@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0A0A0A;
+  --color-surface: #1A1A1A;
+  --color-surface-alt: #242424;
+  --color-accent: #FDE68A;
+  --color-accent-dim: #FCD34D;
+  --color-text: #F5F5F5;
+  --color-text-secondary: #A3A3A3;
+  --color-border: #2A2A2A;
+}
+
+body {
+  @apply bg-bg text-text antialiased;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type="text"],
+input[type="number"] {
+  @apply bg-surface-alt border border-border rounded-xl px-4 py-3 text-text text-lg
+    outline-none transition-colors duration-150
+    focus:border-accent focus:ring-1 focus:ring-accent;
+}
