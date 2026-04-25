@@ -6,6 +6,33 @@ import { PaceSplits } from "./features/pace-splits/PaceSplits";
 
 type Tab = "goal" | "pace";
 
+const logoMark = (
+  <svg className="w-6 h-6" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+    <circle cx="100" cy="114" r="58" stroke="currentColor" strokeWidth="6" />
+    <g stroke="currentColor" strokeWidth="4" strokeLinecap="round">
+      <line x1="100" y1="60" x2="100" y2="68" />
+      <line x1="154" y1="114" x2="146" y2="114" />
+      <line x1="100" y1="168" x2="100" y2="160" />
+      <line x1="46" y1="114" x2="54" y2="114" />
+    </g>
+    <g stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" opacity="0.55">
+      <line x1="127" y1="68" x2="125" y2="73" />
+      <line x1="146" y1="86" x2="142" y2="89" />
+      <line x1="146" y1="142" x2="142" y2="139" />
+      <line x1="127" y1="160" x2="125" y2="155" />
+      <line x1="73" y1="160" x2="75" y2="155" />
+      <line x1="54" y1="142" x2="58" y2="139" />
+      <line x1="54" y1="86" x2="58" y2="89" />
+      <line x1="73" y1="68" x2="75" y2="73" />
+    </g>
+    <line x1="100" y1="114" x2="134" y2="80" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <circle cx="100" cy="114" r="5" fill="currentColor" />
+    <rect x="92" y="36" width="16" height="14" rx="3" fill="currentColor" />
+    <rect x="84" y="48" width="32" height="8" rx="3" fill="currentColor" />
+    <rect x="146" y="58" width="10" height="8" rx="2" fill="currentColor" transform="rotate(45 151 62)" />
+  </svg>
+);
+
 const goalIcon = (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <circle cx="12" cy="12" r="10" />
@@ -28,16 +55,18 @@ export function App(): React.JSX.Element {
       <div className="min-h-dvh flex flex-col md:flex-row">
         {/* Mobile header */}
         <header className="md:hidden flex items-center justify-between px-5 pt-safe-top py-4 border-b border-border">
-          <h1 className="text-lg font-bold tracking-tight">
-            <span className="text-accent">Pace</span>Calc
+          <h1 className="text-lg font-bold tracking-tight flex items-center gap-2">
+            <span className="text-accent">{logoMark}</span>
+            <span><span className="text-accent">Pace</span>Calc</span>
           </h1>
           <UnitToggle />
         </header>
 
         {/* Desktop sidebar */}
         <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-56 border-r border-border p-5 z-10">
-          <h1 className="text-lg font-bold tracking-tight mb-8">
-            <span className="text-accent">Pace</span>Calc
+          <h1 className="text-lg font-bold tracking-tight flex items-center gap-2 mb-8">
+            <span className="text-accent">{logoMark}</span>
+            <span><span className="text-accent">Pace</span>Calc</span>
           </h1>
           <nav className="flex flex-col gap-1">
             <SidebarButton active={tab === "goal"} onClick={() => setTab("goal")} icon={goalIcon} label="Goal Time" />
