@@ -8,7 +8,7 @@ interface UnitContextValue {
 
 const UnitContext = createContext<UnitContextValue | null>(null);
 
-const STORAGE_KEY = "paceup-unit";
+const STORAGE_KEY = "pacecalc-unit";
 
 function getStoredUnit(): UnitSystem {
   try {

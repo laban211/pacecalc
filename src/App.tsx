@@ -15,7 +15,7 @@ export function App(): React.JSX.Element {
         {/* Header */}
         <header className="flex items-center justify-between px-5 pt-safe-top py-4 border-b border-border">
           <h1 className="text-lg font-bold tracking-tight">
-            <span className="text-accent">Pace</span>Up
+            <span className="text-accent">Pace</span>Calc
           </h1>
           <UnitToggle />
         </header>

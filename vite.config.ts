@@ -10,8 +10,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "PaceUp — Running Pace Calculator",
-        short_name: "PaceUp",
+        name: "PaceCalc — Running Pace Calculator",
+        short_name: "PaceCalc",
         description: "A clean, mobile-first running pace calculator",
         theme_color: "#0A0A0A",
         background_color: "#0A0A0A",
