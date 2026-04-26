@@ -40,7 +40,7 @@ export function TimeInput({
   }, [value, isFocused]);
 
   function handleChange(raw: string): void {
-    const cleaned = raw.replace(/[^\d:.]/g, "");
+    const cleaned = raw.replace(/,/g, ".").replace(/[^\d:.]/g, "");
     onChange(cleaned, parseTime(cleaned, mode));
   }
 

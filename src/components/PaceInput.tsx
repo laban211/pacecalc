@@ -65,10 +65,11 @@ export function PaceInput({ onPaceChange, unit }: PaceInputProps): React.JSX.Ele
   }
 
   function handleChange(raw: string): void {
+    const normalized = raw.replace(/,/g, ".");
     const cleaned =
       inputMode === "speed"
-        ? raw.replace(/[^\d.]/g, "")
-        : raw.replace(/[^\d:.]/g, "");
+        ? normalized.replace(/[^\d.]/g, "")
+        : normalized.replace(/[^\d:.]/g, "");
     setValue(cleaned);
     onPaceChange(computePace(cleaned, inputMode), inputMode);
   }

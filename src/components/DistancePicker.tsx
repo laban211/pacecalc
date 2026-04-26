@@ -75,7 +75,7 @@ export function DistancePicker({
   }
 
   function handleCustomChange(raw: string): void {
-    const cleaned = raw.replace(/[^\d.]/g, "");
+    const cleaned = raw.replace(/,/g, ".").replace(/[^\d.]/g, "");
     setCustomValue(cleaned);
     setIsCustom(true);
 
