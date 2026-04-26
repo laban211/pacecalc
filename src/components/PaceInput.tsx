@@ -119,7 +119,7 @@ export function PaceInput({ onPaceChange, unit }: PaceInputProps): React.JSX.Ele
         <input
           ref={inputRef}
           type="text"
-          inputMode={inputMode === "speed" ? "decimal" : "numeric"}
+          inputMode="decimal"
           value={value}
           placeholder={placeholder}
           onChange={(e) => handleChange(e.target.value)}

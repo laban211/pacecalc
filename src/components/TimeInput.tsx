@@ -51,7 +51,7 @@ export function TimeInput({
         <input
           ref={inputRef}
           type="text"
-          inputMode="numeric"
+          inputMode="decimal"
           value={value}
           placeholder={placeholder ?? defaultPlaceholder}
           onChange={(e) => handleChange(e.target.value)}
