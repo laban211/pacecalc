@@ -11,6 +11,18 @@
   --color-border: #2A2A2A;
 }
 
+@utility pt-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility pb-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+html, body {
+  overscroll-behavior: none;
+}
+
 body {
   @apply bg-bg text-text antialiased;
   margin: 0;

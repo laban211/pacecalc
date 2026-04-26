@@ -52,9 +52,9 @@ export function App(): React.JSX.Element {
 
   return (
     <UnitProvider>
-      <div className="min-h-dvh flex flex-col md:flex-row">
+      <div className="h-dvh flex flex-col md:flex-row overflow-hidden">
         {/* Mobile header */}
-        <header className="md:hidden flex items-center justify-between px-5 pt-safe-top py-4 border-b border-border">
+        <header className="md:hidden shrink-0 flex items-center justify-between px-5 pt-safe-top pb-4 border-b border-border">
           <h1 className="text-lg font-bold tracking-tight flex items-center gap-2">
             <span className="text-accent">{logoMark}</span>
             <span><span className="text-accent">Pace</span>Calc</span>
@@ -78,12 +78,12 @@ export function App(): React.JSX.Element {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 px-5 py-6 pb-24 md:pb-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]">
+        <main className="flex-1 overflow-y-auto px-5 py-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]">
           {tab === "goal" ? <GoalTime /> : <PaceSplits />}
         </main>
 
         {/* Mobile bottom tab bar */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-bg/80 backdrop-blur-lg border-t border-border pb-safe-bottom">
+        <nav className="md:hidden shrink-0 bg-bg/80 backdrop-blur-lg border-t border-border">
           <div className="flex max-w-lg mx-auto">
             <TabButton active={tab === "goal"} onClick={() => setTab("goal")} icon={goalIcon} label="Goal Time" />
             <TabButton active={tab === "pace"} onClick={() => setTab("pace")} icon={paceIcon} label="Pace" />
