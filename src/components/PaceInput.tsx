@@ -40,10 +40,19 @@ export function PaceInput({ onPaceChange, unit }: PaceInputProps): React.JSX.Ele
     onPaceChange(null, inputMode);
   }, [unit]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Keep cursor at end after value transformation (e.g. comma → dot).
+  // iOS Safari scrolls the page when setSelectionRange is called on a
+  // focused input, so we save and restore scroll position as a workaround.
+  // See: https://bugs.webkit.org/show_bug.cgi?id=224425
   useEffect(() => {
-    if (inputRef.current && isFocused) {
+    const el = inputRef.current;
+    if (el && isFocused) {
       const len = value.length;
-      inputRef.current.setSelectionRange(len, len);
+      const scrollY = window.scrollY;
+      el.setSelectionRange(len, len);
+      if (window.scrollY !== scrollY) {
+        window.scrollTo(0, scrollY);
+      }
     }
   }, [value, isFocused]);
 
