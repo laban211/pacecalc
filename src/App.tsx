@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { UnitProvider } from "./context/UnitContext";
 import { UnitToggle } from "./components/UnitToggle";
 import { GoalTime } from "./features/goal-time/GoalTime";
@@ -49,15 +49,22 @@ const paceIcon = (
 
 export function App(): React.JSX.Element {
   const [tab, setTab] = useState<Tab>("goal");
-  const [resetKey, setResetKey] = useState(0);
+  const [resetKeys, setResetKeys] = useState({ goal: 0, pace: 0 });
+  const mainRef = useRef<HTMLElement>(null);
+  const scrollPositions = useRef<Record<Tab, number>>({ goal: 0, pace: 0 });
 
-  function handleTab(t: Tab): void {
+  const handleTab = useCallback((t: Tab) => {
     if (t === tab) {
-      setResetKey((k) => k + 1);
+      setResetKeys((prev) => ({ ...prev, [t]: prev[t] + 1 }));
+      if (mainRef.current) mainRef.current.scrollTop = 0;
     } else {
+      if (mainRef.current) scrollPositions.current[tab] = mainRef.current.scrollTop;
       setTab(t);
+      requestAnimationFrame(() => {
+        if (mainRef.current) mainRef.current.scrollTop = scrollPositions.current[t];
+      });
     }
-  }
+  }, [tab]);
 
   return (
     <UnitProvider>
@@ -87,8 +94,9 @@ export function App(): React.JSX.Element {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto px-5 py-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]">
-          {tab === "goal" ? <GoalTime key={resetKey} /> : <PaceSplits key={resetKey} />}
+        <main ref={mainRef} className="flex-1 overflow-y-auto px-5 py-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]">
+          <div className={tab === "goal" ? undefined : "hidden"}><GoalTime key={resetKeys.goal} /></div>
+          <div className={tab === "pace" ? undefined : "hidden"}><PaceSplits key={resetKeys.pace} /></div>
         </main>
 
         {/* Mobile bottom tab bar */}
