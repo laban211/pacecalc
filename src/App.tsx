@@ -49,6 +49,15 @@ const paceIcon = (
 
 export function App(): React.JSX.Element {
   const [tab, setTab] = useState<Tab>("goal");
+  const [resetKey, setResetKey] = useState(0);
+
+  function handleTab(t: Tab): void {
+    if (t === tab) {
+      setResetKey((k) => k + 1);
+    } else {
+      setTab(t);
+    }
+  }
 
   return (
     <UnitProvider>
@@ -69,8 +78,8 @@ export function App(): React.JSX.Element {
             <span><span className="text-accent">Pace</span>Calc</span>
           </h1>
           <nav className="flex flex-col gap-1">
-            <SidebarButton active={tab === "goal"} onClick={() => setTab("goal")} icon={goalIcon} label="Goal Time" />
-            <SidebarButton active={tab === "pace"} onClick={() => setTab("pace")} icon={paceIcon} label="Pace" />
+            <SidebarButton active={tab === "goal"} onClick={() => handleTab("goal")} icon={goalIcon} label="Goal Time" />
+            <SidebarButton active={tab === "pace"} onClick={() => handleTab("pace")} icon={paceIcon} label="Pace" />
           </nav>
           <div className="mt-auto">
             <UnitToggle />
@@ -79,14 +88,14 @@ export function App(): React.JSX.Element {
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto px-5 py-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]">
-          {tab === "goal" ? <GoalTime /> : <PaceSplits />}
+          {tab === "goal" ? <GoalTime key={resetKey} /> : <PaceSplits key={resetKey} />}
         </main>
 
         {/* Mobile bottom tab bar */}
         <nav className="md:hidden shrink-0 bg-bg/80 backdrop-blur-lg border-t border-border">
           <div className="flex max-w-lg mx-auto">
-            <TabButton active={tab === "goal"} onClick={() => setTab("goal")} icon={goalIcon} label="Goal Time" />
-            <TabButton active={tab === "pace"} onClick={() => setTab("pace")} icon={paceIcon} label="Pace" />
+            <TabButton active={tab === "goal"} onClick={() => handleTab("goal")} icon={goalIcon} label="Goal Time" />
+            <TabButton active={tab === "pace"} onClick={() => handleTab("pace")} icon={paceIcon} label="Pace" />
           </div>
         </nav>
       </div>
