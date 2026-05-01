@@ -86,6 +86,20 @@ describe("parseTime", () => {
     });
   });
 
+  describe("three-part dot format (h.mm.ss)", () => {
+    it("parses 0.20.30 as 20m 30s in duration mode", () => {
+      expect(parseTime("0.20.30")).toBe(20 * 60 + 30);
+    });
+
+    it("parses 1.30.00 as 1h 30m in duration mode", () => {
+      expect(parseTime("1.30.00")).toBe(1 * 3600 + 30 * 60);
+    });
+
+    it("parses 2.5.30 as 2h 5m 30s in duration mode", () => {
+      expect(parseTime("2.5.30")).toBe(2 * 3600 + 5 * 60 + 30);
+    });
+  });
+
   describe("invalid inputs", () => {
     it("returns null for empty string", () => {
       expect(parseTime("")).toBeNull();
@@ -109,12 +123,17 @@ describe("parseTime", () => {
       expect(parseTime("4.60", "pace")).toBeNull();
     });
 
-    it("returns null for multiple dots", () => {
-      expect(parseTime("1.2.3")).toBeNull();
+    it("returns null for more than 3 dot parts", () => {
+      expect(parseTime("1.2.3.4")).toBeNull();
     });
 
     it("returns null for more than 3 colon parts", () => {
       expect(parseTime("1:2:3:4")).toBeNull();
+    });
+
+    it("returns null for invalid three-part dot values", () => {
+      expect(parseTime("1.60.00")).toBeNull();
+      expect(parseTime("1.20.60")).toBeNull();
     });
   });
 });
@@ -146,6 +165,16 @@ describe("parseTimeDetailed", () => {
       totalSeconds: 2 * 3600 + 5 * 60 + 30,
       hours: 2,
       minutes: 5,
+      seconds: 30,
+    });
+  });
+
+  it("returns full breakdown for three-part dot input", () => {
+    const result = parseTimeDetailed("0.20.30");
+    expect(result).toEqual({
+      totalSeconds: 20 * 60 + 30,
+      hours: 0,
+      minutes: 20,
       seconds: 30,
     });
   });

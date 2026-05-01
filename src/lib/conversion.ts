@@ -41,10 +41,19 @@ export function parseTimeDetailed(input: string, mode: ParseMode = "duration"): 
   const trimmed = input.trim();
   if (!trimmed) return null;
 
-  // Dot format
+  // Dot format (mirrors colon format: two-part or three-part)
   if (trimmed.includes(".")) {
     const dotParts = trimmed.split(".");
-    if (dotParts.length !== 2) return null;
+    if (dotParts.length < 2 || dotParts.length > 3) return null;
+
+    if (dotParts.length === 3) {
+      // Three-part dot: "0.20.30" → 0h 20m 30s (same as 0:20:30)
+      const [h, m, s] = dotParts.map(Number);
+      if ([h, m, s].some((p) => isNaN(p) || p < 0) || m >= 60 || s >= 60) return null;
+      const totalSeconds = h * 3600 + m * 60 + s;
+      return { totalSeconds, hours: h, minutes: m, seconds: s };
+    }
+
     const major = parseInt(dotParts[0], 10);
     const rawMinor = dotParts[1];
     if (rawMinor.length > 2) return null;

@@ -19,11 +19,11 @@ export function TimeInput({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const defaultPlaceholder = mode === "pace" ? "e.g. 6.30 or 6:30" : "e.g. 1.30 or 1:30:00";
+  const defaultPlaceholder = mode === "pace" ? "e.g. 6.30 or 6:30" : "e.g. 1.30 or 0.20.30";
   const errorHint =
     mode === "pace"
       ? "Try 6.30 (6m 30s), 6:30, or 5 (5m)"
-      : "Try 1.30 (1h 30m), 1:30:00, or 25 (25m)";
+      : "Try 1.30 (1h 30m), 0.20.30 (20m 30s), or 25 (25m)";
 
   const parsed = parseTime(value, mode);
   const hasInput = value.trim().length > 0;
