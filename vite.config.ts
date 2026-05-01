@@ -5,6 +5,10 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   base: "/pacecalc/",
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test-setup.ts"],
+  },
   plugins: [
     react(),
     tailwindcss(),
