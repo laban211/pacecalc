@@ -63,7 +63,7 @@ export function App(): React.JSX.Element {
         </header>
 
         {/* Desktop sidebar */}
-        <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-56 border-r border-border p-5 z-10">
+        <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-56 border-r border-border pt-safe-top px-5 pb-5 z-10">
           <h1 className="text-lg font-bold tracking-tight flex items-center gap-2 mb-8">
             <span className="text-accent">{logoMark}</span>
             <span><span className="text-accent">Pace</span>Calc</span>

@@ -70,6 +70,12 @@ describe("iOS PWA layout invariants", () => {
     hasClasses(header, ["pt-safe-top"]);
   });
 
+  it("desktop sidebar uses pt-safe-top for safe-area padding", () => {
+    const { container } = render(<App />);
+    const sidebar = container.querySelector("aside")!;
+    hasClasses(sidebar, ["pt-safe-top"]);
+  });
+
   it("pt-safe-top utility has a minimum fallback so it never collapses to zero", () => {
     const css = readFileSync(resolve(__dirname, "index.css"), "utf-8");
     const match = css.match(/@utility pt-safe-top\s*\{([^}]+)\}/);

@@ -12,7 +12,7 @@
 }
 
 @utility pt-safe-top {
-  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-top: max(1.25rem, env(safe-area-inset-top));
 }
 
 @utility pb-safe-bottom {
