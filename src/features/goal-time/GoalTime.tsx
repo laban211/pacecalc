@@ -70,6 +70,15 @@ export function GoalTime(): React.JSX.Element {
                 : `${floorToFixed(speedKmh(timeSeconds, distance.km), 2)} km/h`
             }
           />
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => { setDistance(null); setTimeStr(""); setTimeSeconds(null); }}
+              className="text-text-secondary text-sm py-2 px-4 active:text-text transition-colors"
+            >
+              Start over
+            </button>
+          </div>
         </div>
       )}
     </div>

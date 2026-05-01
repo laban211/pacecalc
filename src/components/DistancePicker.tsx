@@ -69,6 +69,10 @@ export function DistancePicker({
   }, [customValue, onSelect, subUnit, unit]);
 
   function handlePresetClick(distance: Distance): void {
+    if (!isCustom && selected?.km === distance.km) {
+      onSelect(null);
+      return;
+    }
     setIsCustom(false);
     setCustomValue("");
     onSelect(distance);

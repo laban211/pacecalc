@@ -21,6 +21,7 @@ export function PaceSplits(): React.JSX.Element {
   const [paceSeconds, setPaceSeconds] = useState<number | null>(null);
   const [inputMode, setInputMode] = useState<InputMode>("pace");
   const [offsetSeconds, setOffsetSeconds] = useState<number | null>(10);
+  const [resetKey, setResetKey] = useState(0);
 
   const hasPace = paceSeconds !== null && paceSeconds > 0;
 
@@ -50,6 +51,7 @@ export function PaceSplits(): React.JSX.Element {
       </div>
 
       <PaceInput
+        key={resetKey}
         unit={unit}
         onPaceChange={(sec, mode) => {
           setPaceSeconds(sec);
@@ -202,6 +204,15 @@ export function PaceSplits(): React.JSX.Element {
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => { setPaceSeconds(null); setResetKey((k) => k + 1); }}
+              className="text-text-secondary text-sm py-2 px-4 active:text-text transition-colors"
+            >
+              Start over
+            </button>
           </div>
         </div>
       )}
