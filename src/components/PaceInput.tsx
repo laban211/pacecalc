@@ -22,11 +22,30 @@ interface PaceInputProps {
    */
   onPaceChange: (paceSeconds: number | null, mode: InputMode) => void;
   unit: UnitSystem;
+  /** Pre-fill with a pace value (seconds in user's unit). */
+  initialPace?: number | null;
 }
 
-export function PaceInput({ onPaceChange, unit }: PaceInputProps): React.JSX.Element {
+function formatPaceValue(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+export function PaceInput({ onPaceChange, unit, initialPace }: PaceInputProps): React.JSX.Element {
   const [inputMode, setInputMode] = useState<InputMode>("pace");
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(() =>
+    initialPace != null && initialPace > 0 ? formatPaceValue(initialPace) : ""
+  );
+
+  // Sync value when initialPace changes from outside (e.g. navigating from Goal Time)
+  const [prevInitialPace, setPrevInitialPace] = useState(initialPace);
+  if (initialPace !== prevInitialPace) {
+    setPrevInitialPace(initialPace);
+    if (initialPace != null && initialPace > 0) {
+      setValue(formatPaceValue(initialPace));
+    }
+  }
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 

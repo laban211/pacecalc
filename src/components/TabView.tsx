@@ -5,8 +5,12 @@ interface Tab {
   content: ReactNode;
 }
 
+interface HandleTabOptions {
+  resetScroll?: boolean;
+}
+
 interface TabViewContextValue {
-  handleTab: (name: string) => void;
+  handleTab: (name: string, options?: HandleTabOptions) => void;
   scrollRef: RefObject<HTMLElement | null>;
   tabs: Tab[];
   active: string;
@@ -15,8 +19,8 @@ interface TabViewContextValue {
 
 const TabViewContext = createContext<TabViewContextValue | null>(null);
 
-/** Switch to a tab, or reset it if already active. */
-export function useTabAction(): (name: string) => void {
+/** Switch to a tab, or reset it if already active. Pass `{ resetScroll: true }` to scroll to top. */
+export function useTabAction(): (name: string, options?: HandleTabOptions) => void {
   const ctx = useContext(TabViewContext);
   if (!ctx) throw new Error("useTabAction must be used within a TabView");
   return ctx.handleTab;
@@ -44,12 +48,13 @@ export function TabView({ tabs, active, onTab, children }: TabViewProps): React.
   const scrollRef = useRef<HTMLElement>(null);
   const scrollPositions = useRef<Record<string, number>>({});
 
-  const handleTab = useCallback((name: string) => {
+  const handleTab = useCallback((name: string, options?: HandleTabOptions) => {
     if (name === active) {
       setResetKeys((prev) => ({ ...prev, [name]: (prev[name] ?? 0) + 1 }));
       if (scrollRef.current) scrollRef.current.scrollTop = 0;
     } else {
       if (scrollRef.current) scrollPositions.current[active] = scrollRef.current.scrollTop;
+      if (options?.resetScroll) scrollPositions.current[name] = 0;
       onTab(name);
       requestAnimationFrame(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollPositions.current[name] ?? 0;

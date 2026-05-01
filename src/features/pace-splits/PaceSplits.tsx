@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { PaceInput, type InputMode } from "../../components/PaceInput";
 import { ResultCard } from "../../components/ResultCard";
 import { useUnit } from "../../context/UnitContext";
+import { usePaceNav } from "../../context/PaceNavContext";
 import { generateSplitRows } from "../../lib/distances";
 import {
   finishTime,
@@ -18,10 +19,21 @@ const OFFSET_OPTIONS = [5, 10, 15, 20, 30, 60] as const;
 
 export function PaceSplits(): React.JSX.Element {
   const { unit } = useUnit();
+  const { pacePerKm: navPacePerKm, setPacePerKm: setNavPacePerKm } = usePaceNav();
   const [paceSeconds, setPaceSeconds] = useState<number | null>(null);
   const [inputMode, setInputMode] = useState<InputMode>("pace");
   const [offsetSeconds, setOffsetSeconds] = useState<number | null>(10);
   const [resetKey, setResetKey] = useState(0);
+
+  // When pace is set from Goal Time tab, apply it
+  useEffect(() => {
+    if (navPacePerKm != null && navPacePerKm > 0) {
+      const paceInUserUnit = unit === "imperial" ? paceKmToMile(navPacePerKm) : navPacePerKm;
+      setPaceSeconds(paceInUserUnit);
+      setInputMode("pace");
+      setNavPacePerKm(null);
+    }
+  }, [navPacePerKm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasPace = paceSeconds !== null && paceSeconds > 0;
 
@@ -53,6 +65,7 @@ export function PaceSplits(): React.JSX.Element {
       <PaceInput
         key={resetKey}
         unit={unit}
+        initialPace={paceSeconds}
         onPaceChange={(sec, mode) => {
           setPaceSeconds(sec);
           setInputMode(mode);

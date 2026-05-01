@@ -3,6 +3,8 @@ import { TimeInput } from "../../components/TimeInput";
 import { DistancePicker } from "../../components/DistancePicker";
 import { ResultCard } from "../../components/ResultCard";
 import { useUnit } from "../../context/UnitContext";
+import { usePaceNav } from "../../context/PaceNavContext";
+import { useTabAction } from "../../components/TabView";
 import type { Distance } from "../../lib/distances";
 import {
   pacePerKm,
@@ -18,8 +20,16 @@ export function GoalTime(): React.JSX.Element {
   const [distance, setDistance] = useState<Distance | null>(null);
   const [timeStr, setTimeStr] = useState("");
   const [timeSeconds, setTimeSeconds] = useState<number | null>(null);
+  const { setPacePerKm } = usePaceNav();
+  const handleTab = useTabAction();
 
   const hasResult = distance !== null && timeSeconds !== null && timeSeconds > 0;
+
+  function handlePaceTap(): void {
+    if (!hasResult) return;
+    setPacePerKm(pacePerKm(timeSeconds, distance.km));
+    handleTab("pace", { resetScroll: true });
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -56,6 +66,8 @@ export function GoalTime(): React.JSX.Element {
                 : `${formatPace(pacePerKm(timeSeconds, distance.km))} /km`
             }
             highlight
+            onTap={handlePaceTap}
+            tapHint="Tap to see finish times"
           />
           <ResultCard
             label={unit === "metric" ? "Speed (km/h)" : "Speed (mph)"}

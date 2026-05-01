@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { UnitProvider } from "./context/UnitContext";
+import { PaceNavProvider } from "./context/PaceNavContext";
 import { UnitToggle } from "./components/UnitToggle";
 import { TabView, TabViewScreens, useTabAction } from "./components/TabView";
 import { GoalTime } from "./features/goal-time/GoalTime";
@@ -58,6 +59,7 @@ export function App(): React.JSX.Element {
 
   return (
     <UnitProvider>
+      <PaceNavProvider>
       <TabView tabs={TAB_SCREENS} active={tab} onTab={(name) => setTab(name as Tab)}>
         <div className="h-dvh flex flex-col md:flex-row overflow-hidden">
           {/* Mobile header */}
@@ -88,6 +90,7 @@ export function App(): React.JSX.Element {
           <MobileNav active={tab} />
         </div>
       </TabView>
+      </PaceNavProvider>
     </UnitProvider>
   );
 }
