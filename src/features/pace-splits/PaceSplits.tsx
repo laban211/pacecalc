@@ -11,6 +11,7 @@ import {
   paceMileToKm,
   paceToSpeedKmh,
   kmToMiles,
+  floorToFixed,
 } from "../../lib/conversion";
 
 const OFFSET_OPTIONS = [5, 10, 15, 20, 30, 60] as const;
@@ -74,13 +75,13 @@ export function PaceSplits(): React.JSX.Element {
               label="Speed"
               value={
                 unit === "metric"
-                  ? `${paceToSpeedKmh(pacePerKm).toFixed(1)} km/h`
-                  : `${kmToMiles(paceToSpeedKmh(pacePerKm)).toFixed(1)} mph`
+                  ? `${floorToFixed(paceToSpeedKmh(pacePerKm), 1)} km/h`
+                  : `${floorToFixed(kmToMiles(paceToSpeedKmh(pacePerKm)), 1)} mph`
               }
               subValue={
                 unit === "metric"
-                  ? `${kmToMiles(paceToSpeedKmh(pacePerKm)).toFixed(1)} mph`
-                  : `${paceToSpeedKmh(pacePerKm).toFixed(1)} km/h`
+                  ? `${floorToFixed(kmToMiles(paceToSpeedKmh(pacePerKm)), 1)} mph`
+                  : `${floorToFixed(paceToSpeedKmh(pacePerKm), 1)} km/h`
               }
               highlight={inputMode === "speed"}
             />

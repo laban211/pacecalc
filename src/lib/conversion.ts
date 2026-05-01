@@ -99,9 +99,11 @@ export function parseTimeDetailed(input: string, mode: ParseMode = "duration"): 
   return { totalSeconds, hours, minutes, seconds: 0 };
 }
 
-/** Format total seconds into "h:mm:ss" or "m:ss" */
+/** Format total seconds into "h:mm:ss" or "m:ss".
+ *  Truncates sub-seconds (floor) to match official race chip-time recording
+ *  used by World Athletics and major marathons (NYC, Boston, Berlin, etc.). */
 export function formatTime(totalSeconds: number): string {
-  const rounded = Math.round(totalSeconds);
+  const rounded = Math.floor(totalSeconds);
   const h = Math.floor(rounded / 3600);
   const m = Math.floor((rounded % 3600) / 60);
   const s = rounded % 60;
@@ -117,9 +119,9 @@ export function formatTime(totalSeconds: number): string {
 
 /** Format pace as "m:ss" per unit (always shows minutes, even if 0) */
 export function formatPace(secondsPerUnit: number): string {
-  const rounded = Math.round(secondsPerUnit);
-  const m = Math.floor(rounded / 60);
-  const s = rounded % 60;
+  const floored = Math.floor(secondsPerUnit);
+  const m = Math.floor(floored / 60);
+  const s = floored % 60;
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
@@ -178,6 +180,12 @@ export function paceKmToMile(paceSecondsPerKm: number): number {
 /** Convert pace (sec/mi) to pace (sec/km) */
 export function paceMileToKm(paceSecondsPerMile: number): number {
   return paceSecondsPerMile / KM_PER_MILE;
+}
+
+/** Floor a number to N decimal places (conservative: never overstates speed) */
+export function floorToFixed(value: number, decimals: number): string {
+  const factor = 10 ** decimals;
+  return (Math.floor(Math.round(value * factor * 1e8) / 1e8) / factor).toFixed(decimals);
 }
 
 /** Format a distance label, adapting to unit system */

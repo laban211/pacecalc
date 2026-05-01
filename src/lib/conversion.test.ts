@@ -17,6 +17,7 @@ import {
   paceKmToMile,
   paceMileToKm,
   formatDistance,
+  floorToFixed,
 } from "./conversion";
 
 // --- Unit conversions ---
@@ -176,9 +177,11 @@ describe("formatTime", () => {
     expect(formatTime(3661)).toBe("1:01:01");
   });
 
-  it("rounds to nearest second", () => {
-    expect(formatTime(280.4)).toBe("4:40");
-    expect(formatTime(280.6)).toBe("4:41");
+  it("truncates sub-seconds to match official race chip-time recording", () => {
+    // 3:59:59.999 → 3:59:59 — same as World Athletics / major marathon timing
+    expect(formatTime(14399.999)).toBe("3:59:59");
+    expect(formatTime(280.9)).toBe("4:40");
+    expect(formatTime(280.1)).toBe("4:40");
   });
 });
 
@@ -191,6 +194,19 @@ describe("formatPace", () => {
 
   it("shows 0:ss for sub-minute paces", () => {
     expect(formatPace(45)).toBe("0:45");
+  });
+
+  it("floors fractional seconds to show a slightly faster pace", () => {
+    // 4:30.6 → 4:30 (not 4:31) so the runner finishes at or before the goal
+    expect(formatPace(270.6)).toBe("4:30");
+    expect(formatPace(270.9)).toBe("4:30");
+    expect(formatPace(270.1)).toBe("4:30");
+  });
+
+  it("never rounds up to a slower pace that would miss the goal", () => {
+    // If true pace is 4:59.9/km, displaying 5:00 would cause the runner to
+    // finish late. Floor ensures we show 4:59.
+    expect(formatPace(299.9)).toBe("4:59");
   });
 });
 
@@ -299,5 +315,26 @@ describe("formatDistance", () => {
   it("formats imperial distances", () => {
     expect(formatDistance(1.60934, "imperial")).toBe("1.00 mi");
     expect(formatDistance(42.195, "imperial")).toBe("26.22 mi");
+  });
+});
+
+// --- floorToFixed ---
+
+describe("floorToFixed", () => {
+  it("floors to the specified decimal places", () => {
+    expect(floorToFixed(12.349, 2)).toBe("12.34");
+    expect(floorToFixed(12.999, 2)).toBe("12.99");
+    expect(floorToFixed(9.99, 1)).toBe("9.9");
+  });
+
+  it("never rounds up (conservative for speed display)", () => {
+    // 12.356 km/h → "12.35" not "12.36"
+    expect(floorToFixed(12.356, 2)).toBe("12.35");
+    expect(floorToFixed(9.99, 0)).toBe("9");
+  });
+
+  it("preserves trailing zeros", () => {
+    expect(floorToFixed(10.0, 2)).toBe("10.00");
+    expect(floorToFixed(5.1, 2)).toBe("5.10");
   });
 });

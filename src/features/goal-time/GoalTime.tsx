@@ -10,6 +10,7 @@ import {
   speedKmh,
   speedMph,
   formatPace,
+  floorToFixed,
 } from "../../lib/conversion";
 
 export function GoalTime(): React.JSX.Element {
@@ -60,13 +61,13 @@ export function GoalTime(): React.JSX.Element {
             label={unit === "metric" ? "Speed (km/h)" : "Speed (mph)"}
             value={
               unit === "metric"
-                ? `${speedKmh(timeSeconds, distance.km).toFixed(2)} km/h`
-                : `${speedMph(timeSeconds, distance.km).toFixed(2)} mph`
+                ? `${floorToFixed(speedKmh(timeSeconds, distance.km), 2)} km/h`
+                : `${floorToFixed(speedMph(timeSeconds, distance.km), 2)} mph`
             }
             subValue={
               unit === "metric"
-                ? `${speedMph(timeSeconds, distance.km).toFixed(2)} mph`
-                : `${speedKmh(timeSeconds, distance.km).toFixed(2)} km/h`
+                ? `${floorToFixed(speedMph(timeSeconds, distance.km), 2)} mph`
+                : `${floorToFixed(speedKmh(timeSeconds, distance.km), 2)} km/h`
             }
           />
         </div>
