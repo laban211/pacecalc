@@ -157,7 +157,7 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
+      className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${
         active ? "text-accent" : "text-text-secondary"
       }`}
     >
