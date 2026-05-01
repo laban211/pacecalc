@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { UnitProvider } from "./context/UnitContext";
 import { UnitToggle } from "./components/UnitToggle";
+import { TabView, TabViewScreens, useTabAction } from "./components/TabView";
 import { GoalTime } from "./features/goal-time/GoalTime";
 import { PaceSplits } from "./features/pace-splits/PaceSplits";
 
@@ -47,67 +48,69 @@ const paceIcon = (
   </svg>
 );
 
+const TAB_SCREENS = [
+  { name: "goal", content: <GoalTime /> },
+  { name: "pace", content: <PaceSplits /> },
+];
+
 export function App(): React.JSX.Element {
   const [tab, setTab] = useState<Tab>("goal");
-  const [resetKeys, setResetKeys] = useState({ goal: 0, pace: 0 });
-  const mainRef = useRef<HTMLElement>(null);
-  const scrollPositions = useRef<Record<Tab, number>>({ goal: 0, pace: 0 });
-
-  const handleTab = useCallback((t: Tab) => {
-    if (t === tab) {
-      setResetKeys((prev) => ({ ...prev, [t]: prev[t] + 1 }));
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    } else {
-      if (mainRef.current) scrollPositions.current[tab] = mainRef.current.scrollTop;
-      setTab(t);
-      requestAnimationFrame(() => {
-        if (mainRef.current) mainRef.current.scrollTop = scrollPositions.current[t];
-      });
-    }
-  }, [tab]);
 
   return (
     <UnitProvider>
-      <div className="h-dvh flex flex-col md:flex-row overflow-hidden">
-        {/* Mobile header */}
-        <header className="md:hidden shrink-0 flex items-center justify-between px-5 pt-safe-top pb-4 border-b border-border">
-          <h1 className="text-lg font-bold tracking-tight flex items-center gap-2">
-            <span className="text-accent">{logoMark}</span>
-            <span><span className="text-accent">Pace</span>Calc</span>
-          </h1>
-          <UnitToggle />
-        </header>
-
-        {/* Desktop sidebar */}
-        <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-56 border-r border-border pt-safe-top px-5 pb-5 z-10">
-          <h1 className="text-lg font-bold tracking-tight flex items-center gap-2 mb-8">
-            <span className="text-accent">{logoMark}</span>
-            <span><span className="text-accent">Pace</span>Calc</span>
-          </h1>
-          <nav className="flex flex-col gap-1">
-            <SidebarButton active={tab === "goal"} onClick={() => handleTab("goal")} icon={goalIcon} label="Goal Time" />
-            <SidebarButton active={tab === "pace"} onClick={() => handleTab("pace")} icon={paceIcon} label="Pace" />
-          </nav>
-          <div className="mt-auto">
+      <TabView tabs={TAB_SCREENS} active={tab} onTab={(name) => setTab(name as Tab)}>
+        <div className="h-dvh flex flex-col md:flex-row overflow-hidden">
+          {/* Mobile header */}
+          <header className="md:hidden shrink-0 flex items-center justify-between px-5 pt-safe-top pb-4 border-b border-border">
+            <h1 className="text-lg font-bold tracking-tight flex items-center gap-2">
+              <span className="text-accent">{logoMark}</span>
+              <span><span className="text-accent">Pace</span>Calc</span>
+            </h1>
             <UnitToggle />
-          </div>
-        </aside>
+          </header>
 
-        {/* Content */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto px-5 py-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]">
-          <div className={tab === "goal" ? undefined : "hidden"}><GoalTime key={resetKeys.goal} /></div>
-          <div className={tab === "pace" ? undefined : "hidden"}><PaceSplits key={resetKeys.pace} /></div>
-        </main>
+          {/* Desktop sidebar */}
+          <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-56 border-r border-border pt-safe-top px-5 pb-5 z-10">
+            <h1 className="text-lg font-bold tracking-tight flex items-center gap-2 mb-8">
+              <span className="text-accent">{logoMark}</span>
+              <span><span className="text-accent">Pace</span>Calc</span>
+            </h1>
+            <SidebarNav active={tab} />
+            <div className="mt-auto">
+              <UnitToggle />
+            </div>
+          </aside>
 
-        {/* Mobile bottom tab bar */}
-        <nav className="md:hidden shrink-0 bg-bg/80 backdrop-blur-lg border-t border-border">
-          <div className="flex max-w-lg mx-auto">
-            <TabButton active={tab === "goal"} onClick={() => handleTab("goal")} icon={goalIcon} label="Goal Time" />
-            <TabButton active={tab === "pace"} onClick={() => handleTab("pace")} icon={paceIcon} label="Pace" />
-          </div>
-        </nav>
-      </div>
+          {/* Content */}
+          <TabViewScreens className="flex-1 overflow-y-auto px-5 py-6 max-w-lg w-full mx-auto md:ml-[max(14rem,calc(50vw-16rem))]" />
+
+          {/* Mobile bottom tab bar */}
+          <MobileNav active={tab} />
+        </div>
+      </TabView>
     </UnitProvider>
+  );
+}
+
+function SidebarNav({ active }: { active: Tab }): React.JSX.Element {
+  const handleTab = useTabAction();
+  return (
+    <nav className="flex flex-col gap-1">
+      <SidebarButton active={active === "goal"} onClick={() => handleTab("goal")} icon={goalIcon} label="Goal Time" />
+      <SidebarButton active={active === "pace"} onClick={() => handleTab("pace")} icon={paceIcon} label="Pace" />
+    </nav>
+  );
+}
+
+function MobileNav({ active }: { active: Tab }): React.JSX.Element {
+  const handleTab = useTabAction();
+  return (
+    <nav className="md:hidden shrink-0 bg-bg/80 backdrop-blur-lg border-t border-border">
+      <div className="flex max-w-lg mx-auto">
+        <TabButton active={active === "goal"} onClick={() => handleTab("goal")} icon={goalIcon} label="Goal Time" />
+        <TabButton active={active === "pace"} onClick={() => handleTab("pace")} icon={paceIcon} label="Pace" />
+      </div>
+    </nav>
   );
 }
 
