@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import { App } from "./App";
 
 /**
@@ -60,5 +62,21 @@ describe("iOS PWA layout invariants", () => {
     const { container } = render(<App />);
     const header = container.querySelector("header")!;
     hasClasses(header, ["shrink-0"]);
+  });
+
+  it("mobile header uses pt-safe-top for safe-area padding", () => {
+    const { container } = render(<App />);
+    const header = container.querySelector("header")!;
+    hasClasses(header, ["pt-safe-top"]);
+  });
+
+  it("pt-safe-top utility has a minimum fallback so it never collapses to zero", () => {
+    const css = readFileSync(resolve(__dirname, "index.css"), "utf-8");
+    const match = css.match(/@utility pt-safe-top\s*\{([^}]+)\}/);
+    expect(match, "pt-safe-top utility not found in index.css").toBeTruthy();
+    const body = match![1];
+    expect(body, "pt-safe-top should use max() to guarantee minimum padding").toMatch(
+      /max\([^,]+,\s*env\(safe-area-inset-top\)\)/
+    );
   });
 });
