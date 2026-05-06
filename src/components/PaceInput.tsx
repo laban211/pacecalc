@@ -5,6 +5,7 @@ import {
   describeTime,
   speedKmhToPace,
   paceKmToMile,
+  floorToFixed,
   type UnitSystem,
 } from "../lib/conversion";
 
@@ -24,6 +25,8 @@ interface PaceInputProps {
   unit: UnitSystem;
   /** Pre-fill with a pace value (seconds in user's unit). */
   initialPace?: number | null;
+  /** Pre-fill with a speed value (km/h or mph in user's unit). */
+  initialSpeed?: number | null;
 }
 
 function formatPaceValue(seconds: number): string {
@@ -32,7 +35,7 @@ function formatPaceValue(seconds: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-export function PaceInput({ onPaceChange, unit, initialPace }: PaceInputProps): React.JSX.Element {
+export function PaceInput({ onPaceChange, unit, initialPace, initialSpeed }: PaceInputProps): React.JSX.Element {
   const [inputMode, setInputMode] = useState<InputMode>("pace");
   const [value, setValue] = useState(() =>
     initialPace != null && initialPace > 0 ? formatPaceValue(initialPace) : ""
@@ -50,6 +53,17 @@ export function PaceInput({ onPaceChange, unit, initialPace }: PaceInputProps): 
       setInputMode("pace");
     }
   }
+
+  // Sync value when initialSpeed changes from outside (e.g. tapping Speed on Goal Time)
+  const [prevInitialSpeed, setPrevInitialSpeed] = useState(initialSpeed);
+  if (initialSpeed !== prevInitialSpeed) {
+    setPrevInitialSpeed(initialSpeed);
+    if (!isFocused && initialSpeed != null && initialSpeed > 0) {
+      setValue(floorToFixed(initialSpeed, 1));
+      setInputMode("speed");
+    }
+  }
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const paceUnitLabel = unit === "metric" ? "min/km" : "min/mi";

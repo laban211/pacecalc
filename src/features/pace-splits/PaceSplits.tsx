@@ -19,19 +19,26 @@ const OFFSET_OPTIONS = [5, 10, 15, 20, 30, 60] as const;
 
 export function PaceSplits(): React.JSX.Element {
   const { unit } = useUnit();
-  const { pacePerKm: navPacePerKm, setPacePerKm: setNavPacePerKm } = usePaceNav();
+  const { pacePerKm: navPacePerKm, navMode, setPaceNav } = usePaceNav();
   const [paceSeconds, setPaceSeconds] = useState<number | null>(null);
   const [inputMode, setInputMode] = useState<InputMode>("pace");
   const [offsetSeconds, setOffsetSeconds] = useState<number | null>(10);
   const [resetKey, setResetKey] = useState(0);
+  const [initialSpeed, setInitialSpeed] = useState<number | null>(null);
 
   // When pace is set from Goal Time tab, apply it
   useEffect(() => {
     if (navPacePerKm != null && navPacePerKm > 0) {
       const paceInUserUnit = unit === "imperial" ? paceKmToMile(navPacePerKm) : navPacePerKm;
       setPaceSeconds(paceInUserUnit);
-      setInputMode("pace");
-      setNavPacePerKm(null);
+      setInputMode(navMode);
+      if (navMode === "speed") {
+        const speedKmh = paceToSpeedKmh(navPacePerKm);
+        setInitialSpeed(unit === "imperial" ? kmToMiles(speedKmh) : speedKmh);
+      } else {
+        setInitialSpeed(null);
+      }
+      setPaceNav(null);
     }
   }, [navPacePerKm]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -66,6 +73,7 @@ export function PaceSplits(): React.JSX.Element {
         key={resetKey}
         unit={unit}
         initialPace={paceSeconds}
+        initialSpeed={initialSpeed}
         onPaceChange={(sec, mode) => {
           setPaceSeconds(sec);
           setInputMode(mode);

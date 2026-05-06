@@ -20,14 +20,20 @@ export function GoalTime(): React.JSX.Element {
   const [distance, setDistance] = useState<Distance | null>(null);
   const [timeStr, setTimeStr] = useState("");
   const [timeSeconds, setTimeSeconds] = useState<number | null>(null);
-  const { setPacePerKm } = usePaceNav();
+  const { setPaceNav } = usePaceNav();
   const handleTab = useTabAction();
 
   const hasResult = distance !== null && timeSeconds !== null && timeSeconds > 0;
 
   function handlePaceTap(): void {
     if (!hasResult) return;
-    setPacePerKm(pacePerKm(timeSeconds, distance.km));
+    setPaceNav(pacePerKm(timeSeconds, distance.km), "pace");
+    handleTab("pace", { resetScroll: true });
+  }
+
+  function handleSpeedTap(): void {
+    if (!hasResult) return;
+    setPaceNav(pacePerKm(timeSeconds, distance.km), "speed");
     handleTab("pace", { resetScroll: true });
   }
 
@@ -81,6 +87,8 @@ export function GoalTime(): React.JSX.Element {
                 ? `${floorToFixed(speedMph(timeSeconds, distance.km), 2)} mph`
                 : `${floorToFixed(speedKmh(timeSeconds, distance.km), 2)} km/h`
             }
+            onTap={handleSpeedTap}
+            tapHint="Tap to see finish times"
           />
           <div className="flex justify-center">
             <button
