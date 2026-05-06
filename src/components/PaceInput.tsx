@@ -38,15 +38,17 @@ export function PaceInput({ onPaceChange, unit, initialPace }: PaceInputProps): 
     initialPace != null && initialPace > 0 ? formatPaceValue(initialPace) : ""
   );
 
+  const [isFocused, setIsFocused] = useState(false);
+
   // Sync value when initialPace changes from outside (e.g. navigating from Goal Time)
+  // Skip while the input is focused — the user is actively typing.
   const [prevInitialPace, setPrevInitialPace] = useState(initialPace);
   if (initialPace !== prevInitialPace) {
     setPrevInitialPace(initialPace);
-    if (initialPace != null && initialPace > 0) {
+    if (!isFocused && initialPace != null && initialPace > 0) {
       setValue(formatPaceValue(initialPace));
     }
   }
-  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const paceUnitLabel = unit === "metric" ? "min/km" : "min/mi";
