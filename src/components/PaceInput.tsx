@@ -47,6 +47,7 @@ export function PaceInput({ onPaceChange, unit, initialPace }: PaceInputProps): 
     setPrevInitialPace(initialPace);
     if (!isFocused && initialPace != null && initialPace > 0) {
       setValue(formatPaceValue(initialPace));
+      setInputMode("pace");
     }
   }
   const inputRef = useRef<HTMLInputElement>(null);
