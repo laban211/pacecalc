@@ -18,6 +18,7 @@ import {
   paceMileToKm,
   formatDistance,
   floorToFixed,
+  riegelTime,
 } from "./conversion";
 
 // --- Unit conversions ---
@@ -365,5 +366,32 @@ describe("floorToFixed", () => {
   it("preserves trailing zeros", () => {
     expect(floorToFixed(10.0, 2)).toBe("10.00");
     expect(floorToFixed(5.1, 2)).toBe("5.10");
+  });
+});
+
+describe("riegelTime", () => {
+  it("returns the same time for the same distance", () => {
+    expect(riegelTime(1200, 5, 5)).toBe(1200);
+  });
+
+  it("predicts 10K from 5K within expected range", () => {
+    // 20:00 5K → roughly 41:30 10K (well-known benchmark)
+    const predicted = riegelTime(1200, 5, 10);
+    expect(predicted).toBeGreaterThan(2450);
+    expect(predicted).toBeLessThan(2550);
+  });
+
+  it("predicts shorter distances are proportionally faster", () => {
+    const marathon = 3 * 3600 + 30 * 60; // 3:30:00
+    const halfPrediction = riegelTime(marathon, 42.195, 21.0975);
+    // Half should be less than exactly half the marathon time (exponent > 1)
+    expect(halfPrediction).toBeLessThan(marathon / 2);
+  });
+
+  it("is symmetric — predicting forward then back returns original time", () => {
+    const original = 1200;
+    const predicted10k = riegelTime(original, 5, 10);
+    const backTo5k = riegelTime(predicted10k, 10, 5);
+    expect(backTo5k).toBeCloseTo(original, 5);
   });
 });

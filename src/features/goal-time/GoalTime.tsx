@@ -6,6 +6,7 @@ import { useUnit } from "../../context/UnitContext";
 import { usePaceNav } from "../../context/PaceNavContext";
 import { useTabAction } from "../../components/TabView";
 import type { Distance } from "../../lib/distances";
+import { RaceEquivalents } from "../../components/RaceEquivalents";
 import {
   pacePerKm,
   pacePerMile,
@@ -89,6 +90,11 @@ export function GoalTime(): React.JSX.Element {
             }
             onTap={handleSpeedTap}
             tapHint="Tap to see finish times"
+          />
+          <RaceEquivalents
+            timeSeconds={timeSeconds}
+            distanceKm={distance.km}
+            distanceLabel={distance.label}
           />
           <div className="flex justify-center">
             <button

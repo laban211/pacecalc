@@ -197,6 +197,16 @@ export function floorToFixed(value: number, decimals: number): string {
   return (Math.floor(Math.round(value * factor * 1e8) / 1e8) / factor).toFixed(decimals);
 }
 
+/** Predict equivalent race time using Riegel's formula.
+ *  T2 = T1 * (D2 / D1) ^ 1.06
+ *  @param timeSeconds  Known finish time in seconds
+ *  @param knownKm      Distance of the known time in km
+ *  @param targetKm     Distance to predict time for in km
+ */
+export function riegelTime(timeSeconds: number, knownKm: number, targetKm: number): number {
+  return timeSeconds * Math.pow(targetKm / knownKm, 1.06);
+}
+
 /** Format a distance label, adapting to unit system */
 export function formatDistance(km: number, unit: UnitSystem): string {
   if (unit === "imperial") {
