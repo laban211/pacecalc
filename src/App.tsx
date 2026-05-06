@@ -61,7 +61,7 @@ export function App(): React.JSX.Element {
     <UnitProvider>
       <PaceNavProvider>
       <TabView tabs={TAB_SCREENS} active={tab} onTab={(name) => setTab(name as Tab)}>
-        <div className="h-dvh flex flex-col md:flex-row overflow-hidden">
+        <div className="h-full flex flex-col md:flex-row overflow-hidden">
           {/* Mobile header */}
           <header className="md:hidden shrink-0 flex items-center justify-between px-5 pt-safe-top pb-4 border-b border-border">
             <h1 className="text-lg font-bold tracking-tight flex items-center gap-2">

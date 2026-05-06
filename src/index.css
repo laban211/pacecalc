@@ -19,7 +19,8 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-html, body {
+html, body, #root {
+  height: 100%;
   overscroll-behavior: none;
 }
 

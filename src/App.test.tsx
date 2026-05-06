@@ -7,11 +7,15 @@ import { App } from "./App";
 /**
  * Structural tests for the iOS PWA safe-area layout fix (a79c081).
  *
- * The app uses a flex-column layout (h-dvh / flex-col / overflow-hidden) so
+ * The app uses a flex-column layout (h-full / flex-col / overflow-hidden) so
  * the bottom nav sits naturally at the end of the flex container instead of
  * being position:fixed.  This avoids a WebKit bug where env(safe-area-inset-*)
  * isn't resolved correctly for fixed elements on initial load in standalone
  * PWA mode (WebKit #191872).
+ *
+ * Uses h-full (100%) instead of h-dvh (100dvh) because dvh units don't
+ * recalculate correctly after orientation changes in iOS standalone PWA mode.
+ * html/body have height: 100% in index.css to make the percentage chain work.
  *
  * These tests assert the CSS class invariants that make the fix work.
  * If a refactor removes any of them, the test fails — forcing a conscious
@@ -35,9 +39,9 @@ function lacksClasses(el: Element, classes: string[]): void {
 describe("iOS PWA layout invariants", () => {
   it("app shell uses full-height flex column with hidden overflow", () => {
     const { container } = render(<App />);
-    const shell = container.querySelector(".h-dvh")!;
-    expect(shell, "could not find app shell with h-dvh").toBeTruthy();
-    hasClasses(shell, ["h-dvh", "flex", "flex-col", "overflow-hidden"]);
+    const shell = container.querySelector(".h-full")!;
+    expect(shell, "could not find app shell with h-full").toBeTruthy();
+    hasClasses(shell, ["h-full", "flex", "flex-col", "overflow-hidden"]);
   });
 
   it("mobile nav is NOT position:fixed (uses flexbox flow instead)", () => {
