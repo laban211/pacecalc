@@ -24,6 +24,11 @@ html, body, #root {
   overscroll-behavior: none;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
 body {
   @apply bg-bg text-text antialiased;
   margin: 0;
