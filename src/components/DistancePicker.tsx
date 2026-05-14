@@ -151,12 +151,12 @@ export function DistancePicker({
           {subUnit}
         </button>
       </div>
-      {isFocused && (
-        <p className="text-xs text-text-secondary">
+      <div className={`grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isFocused ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+        <p className="overflow-hidden text-xs text-text-secondary">
           Tap <button type="button" onClick={cycleSubUnit} onMouseDown={(e) => e.preventDefault()} className="text-accent font-medium">{subUnit}</button> to
           switch to {(unit === "metric" ? METRIC_UNITS : IMPERIAL_UNITS).find((u) => u !== subUnit)}
         </p>
-      )}
+      </div>
       <div className="flex flex-wrap gap-2">
         {PRESET_DISTANCES.map((d) => {
           const isSelected = activePreset?.km === d.km;
