@@ -25,6 +25,24 @@ function toKm(value: number, subUnit: SubUnit): number {
   }
 }
 
+function fromKm(km: number, subUnit: SubUnit): number {
+  switch (subUnit) {
+    case "km":
+      return km;
+    case "m":
+      return km * 1000;
+    case "mi":
+      return kmToMiles(km);
+    case "ft":
+      return km / KM_PER_FOOT;
+  }
+}
+
+function formatForInput(km: number, subUnit: SubUnit): string {
+  const value = fromKm(km, subUnit);
+  return parseFloat(value.toFixed(4)).toString();
+}
+
 function makeLabel(value: number, subUnit: SubUnit): string {
   return `${value} ${subUnit}`;
 }
@@ -35,20 +53,21 @@ interface DistancePickerProps {
 }
 
 export function DistancePicker({
-  selected,
   onSelect,
 }: DistancePickerProps): React.JSX.Element {
   const { unit } = useUnit();
   const [customValue, setCustomValue] = useState("");
-  const [isCustom, setIsCustom] = useState(false);
   const [subUnit, setSubUnit] = useState<SubUnit>(unit === "metric" ? "km" : "mi");
-
-  const availableUnits = unit === "metric" ? METRIC_UNITS : IMPERIAL_UNITS;
+  const [activePreset, setActivePreset] = useState<Distance | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
-    setSubUnit(unit === "metric" ? "km" : "mi");
-    // Only clear custom distance input; preset distances are unit-agnostic
-    if (isCustom) {
+    const newSubUnit = unit === "metric" ? "km" : "mi";
+    setSubUnit(newSubUnit);
+    if (activePreset) {
+      // Re-format preset value in the new unit; distance stays the same
+      setCustomValue(formatForInput(activePreset.km, newSubUnit));
+    } else {
       setCustomValue("");
       onSelect(null);
     }
@@ -60,102 +79,102 @@ export function DistancePicker({
     const next = units[(idx + 1) % units.length];
     setSubUnit(next);
 
-    if (customValue) {
+    if (activePreset) {
+      setCustomValue(formatForInput(activePreset.km, next));
+    } else if (customValue) {
       const num = parseFloat(customValue);
       if (!isNaN(num) && num > 0) {
-        onSelect({ label: makeLabel(num, next), km: toKm(num, next) });
+        const km = toKm(num, next);
+        const matched = findMatchingPreset(km);
+        setActivePreset(matched);
+        onSelect(matched ?? { label: makeLabel(num, next), km });
       }
     }
-  }, [customValue, onSelect, subUnit, unit]);
+  }, [customValue, onSelect, subUnit, unit, activePreset]);
 
   function handlePresetClick(distance: Distance): void {
-    if (!isCustom && selected?.km === distance.km) {
+    if (activePreset?.km === distance.km) {
+      setActivePreset(null);
+      setCustomValue("");
       onSelect(null);
       return;
     }
-    setIsCustom(false);
-    setCustomValue("");
+
+    setActivePreset(distance);
+    setCustomValue(formatForInput(distance.km, subUnit));
     onSelect(distance);
+  }
+
+  function findMatchingPreset(km: number): Distance | null {
+    const EPSILON = 0.001;
+    return PRESET_DISTANCES.find((d) => Math.abs(d.km - km) < EPSILON) ?? null;
   }
 
   function handleCustomChange(raw: string): void {
     const cleaned = raw.replace(/,/g, ".").replace(/[^\d.]/g, "");
     setCustomValue(cleaned);
-    setIsCustom(true);
 
     const num = parseFloat(cleaned);
     if (isNaN(num) || num <= 0) {
+      setActivePreset(null);
       onSelect(null);
       return;
     }
 
     const km = toKm(num, subUnit);
-    onSelect({ label: makeLabel(num, subUnit), km });
-  }
-
-  function handleCustomFocus(): void {
-    setIsCustom(true);
-    if (!customValue) onSelect(null);
+    const matched = findMatchingPreset(km);
+    setActivePreset(matched);
+    onSelect(matched ?? { label: makeLabel(num, subUnit), km });
   }
 
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm text-text-secondary font-medium">Distance</label>
-      <div className="flex flex-wrap gap-2">
-        {PRESET_DISTANCES.map((d) => {
-          const isSelected = !isCustom && selected?.km === d.km;
-          return (
-            <button
-              key={d.label}
-              onClick={() => handlePresetClick(d)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                isSelected
-                  ? "bg-accent text-bg"
-                  : "bg-surface border border-border text-text-secondary active:bg-surface-alt"
-              }`}
-            >
-              {d.label}
-              {unit === "imperial" && (
-                <span className="text-xs opacity-60 ml-1">
-                  ({kmToMiles(d.km).toFixed(2)} mi)
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      <div className="flex items-center gap-3 my-1">
-        <div className="flex-1 h-px bg-border" />
-        <span className="text-xs text-text-secondary uppercase tracking-wider">or</span>
-        <div className="flex-1 h-px bg-border" />
-      </div>
       <div className="relative">
         <input
           type="text"
           inputMode="decimal"
-          placeholder="Custom distance"
+          placeholder="Enter distance"
           value={customValue}
           onChange={(e) => handleCustomChange(e.target.value)}
-          onFocus={handleCustomFocus}
-          className={`w-full text-base pr-14 ${
-            isCustom && customValue ? "!border-accent" : ""
-          }`}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className="w-full text-base pr-14"
         />
         <button
           type="button"
           onClick={cycleSubUnit}
+          onMouseDown={(e) => e.preventDefault()}
           className="absolute right-2 top-1/2 -translate-y-1/2 bg-surface-alt border border-border rounded-lg px-2.5 py-1 text-sm font-medium text-accent transition-colors active:bg-border"
           aria-label={`Switch distance unit, currently ${subUnit}`}
         >
           {subUnit}
         </button>
       </div>
-      {availableUnits.length > 1 && isCustom && (
+      {isFocused && (
         <p className="text-xs text-text-secondary">
-          Tap <span className="text-accent font-medium">{subUnit}</span> to switch
-          to {availableUnits.find((u) => u !== subUnit)}
+          Tap <button type="button" onClick={cycleSubUnit} onMouseDown={(e) => e.preventDefault()} className="text-accent font-medium">{subUnit}</button> to
+          switch to {(unit === "metric" ? METRIC_UNITS : IMPERIAL_UNITS).find((u) => u !== subUnit)}
         </p>
       )}
+      <div className="flex flex-wrap gap-2">
+        {PRESET_DISTANCES.map((d) => {
+          const isSelected = activePreset?.km === d.km;
+          return (
+            <button
+              key={d.label}
+              onClick={() => handlePresetClick(d)}
+              className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                isSelected
+                  ? "bg-accent text-bg border-accent"
+                  : "bg-surface border-border text-text-secondary active:bg-surface-alt"
+              }`}
+            >
+              {d.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
