@@ -1,29 +1,9 @@
-import { useState, useRef, useCallback, createContext, useContext, type ReactNode, type RefObject } from "react";
+import { useState, useRef, useCallback, useContext, type ReactNode } from "react";
+import { TabViewContext, type HandleTabOptions } from "./TabViewContext";
 
 interface Tab {
   name: string;
   content: ReactNode;
-}
-
-interface HandleTabOptions {
-  resetScroll?: boolean;
-}
-
-interface TabViewContextValue {
-  handleTab: (name: string, options?: HandleTabOptions) => void;
-  scrollRef: RefObject<HTMLElement | null>;
-  tabs: Tab[];
-  active: string;
-  resetKeys: Record<string, number>;
-}
-
-const TabViewContext = createContext<TabViewContextValue | null>(null);
-
-/** Switch to a tab, or reset it if already active. Pass `{ resetScroll: true }` to scroll to top. */
-export function useTabAction(): (name: string, options?: HandleTabOptions) => void {
-  const ctx = useContext(TabViewContext);
-  if (!ctx) throw new Error("useTabAction must be used within a TabView");
-  return ctx.handleTab;
 }
 
 interface TabViewProps {

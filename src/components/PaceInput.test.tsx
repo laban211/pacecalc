@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { useState } from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { PaceInput, type InputMode } from "./PaceInput";
+import { PaceInput } from "./PaceInput";
 
 /**
  * Wrapper that mirrors the parent-child feedback loop in PaceSplits:
@@ -14,7 +14,7 @@ function PaceInputHarness({ initial = null }: { initial?: number | null }): Reac
     <PaceInput
       unit="metric"
       initialPace={pace}
-      onPaceChange={(sec: number | null, _mode: InputMode) => setPace(sec)}
+      onPaceChange={(sec) => setPace(sec)}
     />
   );
 }

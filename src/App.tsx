@@ -2,7 +2,8 @@ import { useState } from "react";
 import { UnitProvider } from "./context/UnitContext";
 import { PaceNavProvider } from "./context/PaceNavContext";
 import { UnitToggle } from "./components/UnitToggle";
-import { TabView, TabViewScreens, useTabAction } from "./components/TabView";
+import { TabView, TabViewScreens } from "./components/TabView";
+import { useTabAction } from "./hooks/useTabAction";
 import { GoalTime } from "./features/goal-time/GoalTime";
 import { PaceSplits } from "./features/pace-splits/PaceSplits";
 

@@ -1,12 +1,6 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import type { UnitSystem } from "../lib/conversion";
-
-interface UnitContextValue {
-  unit: UnitSystem;
-  toggle: () => void;
-}
-
-const UnitContext = createContext<UnitContextValue | null>(null);
+import { UnitContext } from "./UnitContextDef";
 
 const STORAGE_KEY = "pacecalc-unit";
 
@@ -40,10 +34,4 @@ export function UnitProvider({ children }: { children: ReactNode }): React.JSX.E
       {children}
     </UnitContext.Provider>
   );
-}
-
-export function useUnit(): UnitContextValue {
-  const ctx = useContext(UnitContext);
-  if (!ctx) throw new Error("useUnit must be used within UnitProvider");
-  return ctx;
 }

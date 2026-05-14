@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { PaceInput, type InputMode } from "../../components/PaceInput";
 import { ResultCard } from "../../components/ResultCard";
-import { useUnit } from "../../context/UnitContext";
-import { usePaceNav } from "../../context/PaceNavContext";
+import { useUnit } from "../../hooks/useUnit";
+import { usePaceNav } from "../../hooks/usePaceNav";
 import { generateSplitRows } from "../../lib/distances";
 import {
   finishTime,

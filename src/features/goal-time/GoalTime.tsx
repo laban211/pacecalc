@@ -2,9 +2,9 @@ import { useState } from "react";
 import { TimeInput } from "../../components/TimeInput";
 import { DistancePicker } from "../../components/DistancePicker";
 import { ResultCard } from "../../components/ResultCard";
-import { useUnit } from "../../context/UnitContext";
-import { usePaceNav } from "../../context/PaceNavContext";
-import { useTabAction } from "../../components/TabView";
+import { useUnit } from "../../hooks/useUnit";
+import { usePaceNav } from "../../hooks/usePaceNav";
+import { useTabAction } from "../../hooks/useTabAction";
 import type { Distance } from "../../lib/distances";
 import { RaceEquivalents } from "../../components/RaceEquivalents";
 import {

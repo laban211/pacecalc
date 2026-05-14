@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PRESET_DISTANCES } from "../lib/distances";
 import { riegelTime, formatTime, pacePerKm, pacePerMile, formatPace } from "../lib/conversion";
-import { useUnit } from "../context/UnitContext";
+import { useUnit } from "../hooks/useUnit";
 
 interface RaceEquivalentsProps {
   timeSeconds: number;

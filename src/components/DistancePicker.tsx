@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PRESET_DISTANCES, type Distance } from "../lib/distances";
-import { useUnit } from "../context/UnitContext";
+import { useUnit } from "../hooks/useUnit";
 import { kmToMiles, milesToKm, sanitizeInput } from "../lib/conversion";
 
 type MetricSub = "m" | "km";

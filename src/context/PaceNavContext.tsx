@@ -1,14 +1,7 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { PaceNavContext } from "./PaceNavContextDef";
 
 type NavMode = "pace" | "speed";
-
-interface PaceNavState {
-  pacePerKm: number | null;
-  navMode: NavMode;
-  setPaceNav: (pacePerKm: number | null, mode?: NavMode) => void;
-}
-
-const PaceNavContext = createContext<PaceNavState | null>(null);
 
 export function PaceNavProvider({ children }: { children: ReactNode }): React.JSX.Element {
   const [pacePerKm, setPacePerKm] = useState<number | null>(null);
@@ -24,10 +17,4 @@ export function PaceNavProvider({ children }: { children: ReactNode }): React.JS
       {children}
     </PaceNavContext.Provider>
   );
-}
-
-export function usePaceNav(): PaceNavState {
-  const ctx = useContext(PaceNavContext);
-  if (!ctx) throw new Error("usePaceNav must be used within a PaceNavProvider");
-  return ctx;
 }
