@@ -1,5 +1,7 @@
 # PaceCalc
 
+**[laban211.github.io/pacecalc](https://laban211.github.io/pacecalc/)**
+
 A clean, vibe-coded, offline-ready and hopefully useful running pace calculator for planning races and training sessions.
 
 ## Features
