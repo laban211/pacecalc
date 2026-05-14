@@ -14,8 +14,9 @@ describe("RaceEquivalents", () => {
   it("is collapsed by default", () => {
     const { container } = renderWithProviders(<RaceEquivalents {...props} />);
     expect(container.querySelector("button")!.textContent).toContain("Show");
-    // No prediction rows visible
-    expect(container.querySelectorAll(".font-mono")).toHaveLength(0);
+    // Panel is collapsed (grid-rows-[0fr] hides content)
+    const panel = container.querySelector(".grid")!;
+    expect(panel.classList).toContain("opacity-0");
   });
 
   it("shows predictions for all distances except the selected one", () => {

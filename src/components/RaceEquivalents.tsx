@@ -10,7 +10,7 @@ interface RaceEquivalentsProps {
 }
 
 const chevron = (
-  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
   </svg>
 );
@@ -32,58 +32,60 @@ export function RaceEquivalents({
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-center gap-1.5 text-text-secondary text-sm py-2 px-4 active:text-text transition-colors"
       >
-        <span className={`transition-transform ${isExpanded ? "rotate-180" : ""}`}>
+        <span className={`transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? "rotate-180" : ""}`}>
           {chevron}
         </span>
         {isExpanded ? "Hide" : "Show"} race equivalents
       </button>
 
-      {isExpanded && (
-        <div className="animate-in fade-in bg-surface border border-border rounded-2xl p-4 mt-2">
-          <p className="text-xs text-text-secondary mb-3">
-            Based on your {distanceLabel} time, you could roughly expect:
-          </p>
+      <div className={`grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+        <div className="overflow-hidden">
+          <div className="bg-surface border border-border rounded-2xl p-4 mt-2">
+            <p className="text-xs text-text-secondary mb-3">
+              Based on your {distanceLabel} time, you could roughly expect:
+            </p>
 
-          <div className="flex flex-col gap-2.5">
-            {targets.map((d) => {
-              const predicted = riegelTime(timeSeconds, distanceKm, d.km);
-              const pace =
-                unit === "metric"
-                  ? pacePerKm(predicted, d.km)
-                  : pacePerMile(predicted, d.km);
+            <div className="flex flex-col gap-2.5">
+              {targets.map((d) => {
+                const predicted = riegelTime(timeSeconds, distanceKm, d.km);
+                const pace =
+                  unit === "metric"
+                    ? pacePerKm(predicted, d.km)
+                    : pacePerMile(predicted, d.km);
 
-              return (
-                <div key={d.label} className="flex items-baseline justify-between">
-                  <span className="text-sm text-text-secondary font-medium">
-                    {d.label}
-                  </span>
-                  <div className="text-right">
-                    <span className="font-mono font-semibold text-text">
-                      {formatTime(predicted)}
+                return (
+                  <div key={d.label} className="flex items-baseline justify-between">
+                    <span className="text-sm text-text-secondary font-medium">
+                      {d.label}
                     </span>
-                    <span className="text-xs text-text-secondary ml-2">
-                      {formatPace(pace)} /{unit === "metric" ? "km" : "mi"}
-                    </span>
+                    <div className="text-right">
+                      <span className="font-mono font-semibold text-text">
+                        {formatTime(predicted)}
+                      </span>
+                      <span className="text-xs text-text-secondary ml-2">
+                        {formatPace(pace)} /{unit === "metric" ? "km" : "mi"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
 
-          <p className="text-xs text-text-secondary/60 mt-3">
-            Estimates use{" "}
-            <a
-              href="https://en.wikipedia.org/wiki/Peter_Riegel"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Riegel&apos;s formula
-            </a>
-            {" "}and assume similar training across distances.
-          </p>
+            <p className="text-xs text-text-secondary/60 mt-3">
+              Estimates use{" "}
+              <a
+                href="https://en.wikipedia.org/wiki/Peter_Riegel"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                Riegel&apos;s formula
+              </a>
+              {" "}and assume similar training across distances.
+            </p>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

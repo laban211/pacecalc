@@ -82,7 +82,7 @@ export function PaceSplits(): React.JSX.Element {
       />
 
       {hasPace && pacePerKm !== null && pacePerKm > 0 && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 animate-in fade-in">
           {/* Summary cards — highlight whichever the user entered */}
           <div className="flex gap-3">
             <ResultCard
