@@ -53,12 +53,30 @@ export function PaceSplits(): React.JSX.Element {
       : paceSeconds
     : null;
 
-  const rows = useMemo(() => generateSplitRows(43), []);
+  const rows = useMemo(() => generateSplitRows(unit), [unit]);
+
+  // Precompute zebra striping to avoid index-shift artifacts from inserted special rows
+  const rowsWithZebra = useMemo(() => {
+    let stripeCount = 0;
+    return rows.map((row) => ({
+      ...row,
+      zebra: !row.highlight && stripeCount++ % 2 === 1,
+    }));
+  }, [rows]);
 
   const offsetLabel = unit === "metric" ? "/km" : "/mi";
   const offsetLabel2 =
     offsetSeconds !== null
       ? `${offsetSeconds >= 60 ? `${offsetSeconds / 60}min` : `${offsetSeconds}s`}${offsetLabel}`
+      : null;
+
+  // Offset is entered in the user's unit (sec/km or sec/mi).
+  // Convert to sec/km for calculations against pacePerKm.
+  const offsetPerKm =
+    offsetSeconds !== null
+      ? unit === "imperial"
+        ? paceMileToKm(offsetSeconds)
+        : offsetSeconds
       : null;
 
   return (
@@ -148,10 +166,10 @@ export function PaceSplits(): React.JSX.Element {
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-text-secondary text-xs uppercase tracking-wider">
-                  <th className="text-left py-2 pr-2 font-medium sticky left-0 bg-bg">
+                  <th className="text-left py-2 pl-2 pr-2 font-medium sticky left-0 z-10 bg-bg">
                     Dist
                   </th>
-                  {offsetSeconds !== null && (
+                  {offsetPerKm !== null && (
                     <th className="text-right py-2 px-2 font-medium text-sky-300/70 whitespace-nowrap">
                       -{offsetLabel2}
                     </th>
@@ -159,50 +177,48 @@ export function PaceSplits(): React.JSX.Element {
                   <th className="text-right py-2 px-2 font-medium text-accent whitespace-nowrap">
                     Time
                   </th>
-                  {offsetSeconds !== null && (
-                    <th className="text-right py-2 pl-2 font-medium text-rose-300/70 whitespace-nowrap">
+                  {offsetPerKm !== null && (
+                    <th className="text-right py-2 px-2 font-medium text-rose-300/70 whitespace-nowrap">
                       +{offsetLabel2}
                     </th>
                   )}
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row, i) => {
+                {rowsWithZebra.map((row) => {
                   const mainTime = finishTime(pacePerKm, row.km);
 
                   let fasterTime: number | null = null;
                   let slowerTime: number | null = null;
-                  if (offsetSeconds !== null) {
-                    const fasterPace = pacePerKm - offsetSeconds;
+                  if (offsetPerKm !== null) {
+                    const fasterPace = pacePerKm - offsetPerKm;
                     fasterTime = fasterPace > 0 ? finishTime(fasterPace, row.km) : null;
-                    slowerTime = finishTime(pacePerKm + offsetSeconds, row.km);
+                    slowerTime = finishTime(pacePerKm + offsetPerKm, row.km);
                   }
-
-                  const zebra = !row.highlight && i % 2 === 1;
 
                   return (
                     <tr
                       key={row.km}
                       className={
                         row.highlight
-                          ? "bg-surface/60"
-                          : zebra
+                          ? "bg-accent/10"
+                          : row.zebra
                             ? "bg-surface"
                             : ""
                       }
                     >
                       <td
-                        className={`py-2 pr-2 sticky left-0 whitespace-nowrap ${
+                        className={`py-2 pl-2 pr-2 sticky left-0 z-10 whitespace-nowrap ${
                           row.highlight
-                            ? "font-bold text-text bg-surface/60"
-                            : zebra
+                            ? "font-bold text-accent bg-accent/10"
+                            : row.zebra
                               ? "text-text-secondary bg-surface"
                               : "text-text-secondary bg-bg"
                         }`}
                       >
                         {row.label}
                       </td>
-                      {offsetSeconds !== null && (
+                      {offsetPerKm !== null && (
                         <td className="text-right py-2 px-2 font-mono text-sky-300/70">
                           {fasterTime !== null ? formatTime(fasterTime) : "—"}
                         </td>
@@ -211,13 +227,13 @@ export function PaceSplits(): React.JSX.Element {
                         className={`text-right py-2 px-2 font-mono ${
                           row.highlight
                             ? "text-accent font-bold"
-                            : "text-text font-semibold"
+                            : "text-text"
                         }`}
                       >
                         {formatTime(mainTime)}
                       </td>
-                      {offsetSeconds !== null && (
-                        <td className="text-right py-2 pl-2 font-mono text-rose-300/70">
+                      {offsetPerKm !== null && (
+                        <td className="text-right py-2 px-2 font-mono text-rose-300/70">
                           {slowerTime !== null ? formatTime(slowerTime) : "—"}
                         </td>
                       )}
