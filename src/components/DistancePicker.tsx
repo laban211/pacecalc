@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { PRESET_DISTANCES, type Distance } from "../lib/distances";
 import { useUnit } from "../context/UnitContext";
-import { kmToMiles, milesToKm } from "../lib/conversion";
+import { kmToMiles, milesToKm, sanitizeInput } from "../lib/conversion";
 
 type MetricSub = "m" | "km";
 type ImperialSub = "ft" | "mi";
@@ -48,7 +48,6 @@ function makeLabel(value: number, subUnit: SubUnit): string {
 }
 
 interface DistancePickerProps {
-  selected: Distance | null;
   onSelect: (distance: Distance | null) => void;
 }
 
@@ -71,9 +70,10 @@ export function DistancePicker({
       setCustomValue("");
       onSelect(null);
     }
-  }, [unit]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset on unit change; onSelect identity is unstable and activePreset is read inside, not reacted to
+  }, [unit]);
 
-  const cycleSubUnit = useCallback((): void => {
+  function cycleSubUnit(): void {
     const units = unit === "metric" ? METRIC_UNITS : IMPERIAL_UNITS;
     const idx = (units as readonly string[]).indexOf(subUnit);
     const next = units[(idx + 1) % units.length];
@@ -90,7 +90,7 @@ export function DistancePicker({
         onSelect(matched ?? { label: makeLabel(num, next), km });
       }
     }
-  }, [customValue, onSelect, subUnit, unit, activePreset]);
+  }
 
   function handlePresetClick(distance: Distance): void {
     if (activePreset?.km === distance.km) {
@@ -111,7 +111,7 @@ export function DistancePicker({
   }
 
   function handleCustomChange(raw: string): void {
-    const cleaned = raw.replace(/,/g, ".").replace(/[^\d.]/g, "");
+    const cleaned = sanitizeInput(raw, false);
     setCustomValue(cleaned);
 
     const num = parseFloat(cleaned);

@@ -1,19 +1,20 @@
 import { useState, useRef, useEffect } from "react";
+import { useCursorAtEnd } from "../hooks/useCursorAtEnd";
 import {
   parseTime,
   parseTimeDetailed,
   describeTime,
   speedKmhToPace,
   paceKmToMile,
+  milesToKm,
   floorToFixed,
+  sanitizeInput,
   type UnitSystem,
 } from "../lib/conversion";
 
 type InputMode = "pace" | "speed";
 
 export type { InputMode };
-
-const KM_PER_MILE = 1.60934;
 
 interface PaceInputProps {
   /**
@@ -74,23 +75,10 @@ export function PaceInput({ onPaceChange, unit, initialPace, initialSpeed }: Pac
   useEffect(() => {
     setValue("");
     onPaceChange(null, inputMode);
-  }, [unit]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset on unit change; onPaceChange identity is unstable and inputMode would cause unwanted resets
+  }, [unit]);
 
-  // Keep cursor at end after value transformation (e.g. comma → dot).
-  // iOS Safari scrolls the page when setSelectionRange is called on a
-  // focused input, so we save and restore scroll position as a workaround.
-  // See: https://bugs.webkit.org/show_bug.cgi?id=224425
-  useEffect(() => {
-    const el = inputRef.current;
-    if (el && isFocused) {
-      const len = value.length;
-      const scrollY = window.scrollY;
-      el.setSelectionRange(len, len);
-      if (window.scrollY !== scrollY) {
-        window.scrollTo(0, scrollY);
-      }
-    }
-  }, [value, isFocused]);
+  useCursorAtEnd(inputRef, value, isFocused);
 
   function computePace(raw: string, mode: InputMode): number | null {
     if (!raw.trim()) return null;
@@ -99,7 +87,7 @@ export function PaceInput({ onPaceChange, unit, initialPace, initialSpeed }: Pac
       const speed = parseFloat(raw);
       if (isNaN(speed) || speed <= 0) return null;
       // Convert to km/h regardless of unit system, then to sec/km
-      const speedKmh = unit === "imperial" ? speed * KM_PER_MILE : speed;
+      const speedKmh = unit === "imperial" ? milesToKm(speed) : speed;
       const paceSecPerKm = speedKmhToPace(speedKmh);
       // Return in the user's unit system
       return unit === "imperial" ? paceKmToMile(paceSecPerKm) : paceSecPerKm;
@@ -110,11 +98,7 @@ export function PaceInput({ onPaceChange, unit, initialPace, initialSpeed }: Pac
   }
 
   function handleChange(raw: string): void {
-    const normalized = raw.replace(/,/g, ".");
-    const cleaned =
-      inputMode === "speed"
-        ? normalized.replace(/[^\d.]/g, "")
-        : normalized.replace(/[^\d:.]/g, "");
+    const cleaned = sanitizeInput(raw, inputMode !== "speed");
     setValue(cleaned);
     onPaceChange(computePace(cleaned, inputMode), inputMode);
   }

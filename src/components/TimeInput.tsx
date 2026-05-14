@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { parseTime, parseTimeDetailed, describeTime, type ParseMode } from "../lib/conversion";
+import { useState, useRef } from "react";
+import { useCursorAtEnd } from "../hooks/useCursorAtEnd";
+import { parseTime, parseTimeDetailed, describeTime, sanitizeInput, type ParseMode } from "../lib/conversion";
 
 interface TimeInputProps {
   value: string;
@@ -32,24 +33,10 @@ export function TimeInput({
     ? (() => { const p = parseTimeDetailed(value, mode); return p ? describeTime(p) : null; })()
     : null;
 
-  // Keep cursor at end after value transformation (e.g. comma → dot).
-  // iOS Safari scrolls the page when setSelectionRange is called on a
-  // focused input, so we save and restore scroll position as a workaround.
-  // See: https://bugs.webkit.org/show_bug.cgi?id=224425
-  useEffect(() => {
-    const el = inputRef.current;
-    if (el && isFocused) {
-      const len = value.length;
-      const scrollY = window.scrollY;
-      el.setSelectionRange(len, len);
-      if (window.scrollY !== scrollY) {
-        window.scrollTo(0, scrollY);
-      }
-    }
-  }, [value, isFocused]);
+  useCursorAtEnd(inputRef, value, isFocused);
 
   function handleChange(raw: string): void {
-    const cleaned = raw.replace(/,/g, ".").replace(/[^\d:.]/g, "");
+    const cleaned = sanitizeInput(raw, true);
     onChange(cleaned, parseTime(cleaned, mode));
   }
 

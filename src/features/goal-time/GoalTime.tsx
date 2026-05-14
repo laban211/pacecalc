@@ -47,7 +47,7 @@ export function GoalTime(): React.JSX.Element {
         </p>
       </div>
 
-      <DistancePicker selected={distance} onSelect={setDistance} />
+      <DistancePicker onSelect={setDistance} />
 
       <TimeInput
         label="Goal time"

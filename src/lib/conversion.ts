@@ -207,6 +207,16 @@ export function riegelTime(timeSeconds: number, knownKm: number, targetKm: numbe
   return timeSeconds * Math.pow(targetKm / knownKm, 1.06);
 }
 
+/** Normalize input: comma → dot, strip characters not valid for the input type.
+ *  When `allowColon` is true, digits, dots, and colons are kept (time/pace input).
+ *  When false, only digits and dots are kept (speed/distance input). */
+export function sanitizeInput(raw: string, allowColon: boolean): string {
+  const normalized = raw.replace(/,/g, ".");
+  return allowColon
+    ? normalized.replace(/[^\d:.]/g, "")
+    : normalized.replace(/[^\d.]/g, "");
+}
+
 /** Format a distance label, adapting to unit system */
 export function formatDistance(km: number, unit: UnitSystem): string {
   if (unit === "imperial") {

@@ -40,7 +40,8 @@ export function PaceSplits(): React.JSX.Element {
       }
       setPaceNav(null);
     }
-  }, [navPacePerKm]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only fire when a navigation event sets a new pace; other deps are stable setters or handled by separate effects
+  }, [navPacePerKm]);
 
   const hasPace = paceSeconds !== null && paceSeconds > 0;
 
